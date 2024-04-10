@@ -57,42 +57,68 @@ function chooseRadius(magnitude) {
 };
 
 
-//Pull data from the geoJSON sample with d3 -- all earthquakes within last week
-d3.json(url).then(function (data) {
+
+
+// Pull data from the GeoJSON sample with d3 -- all earthquakes within the last week
+d3.json(url).then(function(data) {
     L.geoJson(data, {
-        pointToLayer: function (feature, latlon) {  //declare a point with lat and lon
-            return L.circleMarker(latlon).bindPopup(feature.id); //binds marker with the earthquake id
+        pointToLayer: function(feature, latlng) {
+            // Customize tooltip content to show required information
+            var tooltipContent = `<b>Earthquake ID:</b> ${feature.id}<br>
+                                <b>Magnitude:</b> ${feature.properties.mag}<br>
+                                <b>Depth:</b> ${feature.geometry.coordinates[2]} km`;
+
+            // Create circle marker with customized tooltip content
+            var marker = L.circleMarker(latlng, {
+                radius: chooseRadius(feature.properties.mag)
+            });
+
+            // Bind tooltip to each marker
+            marker.bindTooltip(tooltipContent);
+
+            return marker;
         },
-        style: styleInfo //style
+        style: styleInfo // Style
     }).addTo(earthquake_data);
-    earthquake_data.addTo(myMap); //add earthquake data to map layer
-
-    //pull the tectonic plate data with d3
-    d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json").then(function (data) {
-        L.geoJson(data, {
-            color: "purple",  //line color
-            weight: 3
-        }).addTo(tectonics); //add the tectonic data to the tectonic layergroup
-        tectonics.addTo(myMap);
-    });
-
+    earthquake_data.addTo(myMap); // Add earthquake data to map layer
 });
+
+// Function to choose the radius of each earthquake marker (based on magnitude)
+function chooseRadius(magnitude) {
+    return magnitude * 5;
+};
+
+
 //create legend
 var legend = L.control({ position: "bottomright" });
 legend.onAdd = function(myMap) {
     var div = L.DomUtil.create("div", "legend");
-       div.innerHTML += "<h4>Depth Color Legend</h4>";
-       div.innerHTML += '<i style="background: red"></i><span>(Depth < 10)</span><br>';
-       div.innerHTML += '<i style="background: orange"></i><span>(10 < Depth <= 25)</span><br>';
-       div.innerHTML += '<i style="background: yellow"></i><span>(25 < Depth <= 40)</span><br>';
-       div.innerHTML += '<i style="background: pink"></i><span>(40 < Depth <= 55)</span><br>';
-       div.innerHTML += '<i style="background: blue"></i><span>(55 < Depth <= 70)</span><br>';
-       div.innerHTML += '<i style="background: green"></i><span>(Depth > 70)</span><br>';
-  
+    div.innerHTML += "<h4>Depth Color Legend</h4>";
+    // Define legend items with units of measure
+    div.innerHTML += '<i style="background: red"></i><span>(Depth < 10 km)</span><br>';
+    div.innerHTML += '<i style="background: orange"></i><span>(10 - 25 km)</span><br>';
+    div.innerHTML += '<i style="background: yellow"></i><span>(25 - 40 km)</span><br>';
+    div.innerHTML += '<i style="background: pink"></i><span>(40 - 55 km)</span><br>';
+    div.innerHTML += '<i style="background: blue"></i><span>(55 - 70 km)</span><br>';
+    div.innerHTML += '<i style="background: green"></i><span>(Depth > 70 km)</span><br>';
+
+
+    // Style legend container
+    div.style.width = '100px'; // Set the width of the legend container
+
+    // Style legend items
+    div.childNodes.forEach(function(item) {
+        item.style.display = 'inline-block';
+        item.style.width = '50px'; // Adjust width as needed
+        item.style.height = '50px'; // Adjust height as needed
+        item.style.marginRight = '5px'; // Adjust margin as needed
+    });
+
     return div;
-  };
-  //add the legend to the map
-  legend.addTo(myMap);
+};
+//add the legend to the map
+legend.addTo(myMap);
+
 
 
 
