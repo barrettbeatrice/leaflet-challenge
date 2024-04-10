@@ -1,6 +1,8 @@
 
 // Store the URL for the GeoJSON data
-const url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson';
+url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson';
+
+
 
 // Add Leaflet tile layer, give it an attribution
 let streets = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -106,13 +108,12 @@ legend.onAdd = function(myMap) {
     // Style legend container
     div.style.width = '100px'; // Set the width of the legend container
 
-    // Style legend items
-    div.childNodes.forEach(function(item) {
-        item.style.display = 'inline-block';
-        item.style.width = '50px'; // Adjust width as needed
-        item.style.height = '50px'; // Adjust height as needed
-        item.style.marginRight = '5px'; // Adjust margin as needed
-    });
+   // Style legend items
+   div.childNodes.forEach(function(item) {
+    item.style.display = 'flex';
+    item.style.alignItems = 'center';
+    item.style.marginBottom = '3px'; // Adjust margin bottom as needed
+});
 
     return div;
 };
@@ -122,39 +123,6 @@ legend.addTo(myMap);
 
 
 
-
-//EXTRA check
-//to get all information from one earthquake in dataset; in this case, "nc73872510"
-//and put it all into console to log for verification
-d3.json(url).then(function (data) {
-    console.log(data);
-    let features = data.features;
-    console.log(features);
-
-    let results = features.filter(id => id.id == "nc73872510"); //replace the id string with the argument of the function once created
-    let first_result = results[0];
-    console.log(first_result);
-
-    let geometry = first_result.geometry;
-    console.log(geometry);
-
-    let coordinates = geometry.coordinates;
-    console.log(coordinates);
-    console.log(coordinates[0]); // longitude
-    console.log(coordinates[1]); // latitude
-    console.log(coordinates[2]); // depth of earthquake
-
-    let magnitude = first_result.properties.mag;
-    console.log(magnitude);
-
-    //define depth
-    let depth = geometry.coordinates[2];
-    console.log(depth);
-
-    let id = first_result.id;
-    console.log(id);
-
-});
 
 
 
